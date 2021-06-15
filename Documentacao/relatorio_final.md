@@ -66,9 +66,9 @@ Desta maneira, todos os pedidos esperam no mínimo 1 dia útil para serem empaco
 
 Tecnologia utilizada: JAVA.
 
-
 Ferramentas: Eclipse IDE;
 
+![Exemplo de um Modelo BPMN](imagens/arthurvitorsapore_81994_3197335_Tecnologias.jpg "Tecnologias utilizada").
 
 
 ## 4. Modelagem de dados
