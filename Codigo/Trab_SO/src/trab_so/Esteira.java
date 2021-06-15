@@ -1,5 +1,8 @@
 package trab_so;
-public class Esteira {
+
+import java.util.List;
+
+public class Esteira extends Thread{
     /**
      * Armazena o tempo de saida da van, a loja abre as 08:00 e a van sai 12:00, 4 horas em segundos é igual a 14400
      */
@@ -11,11 +14,11 @@ public class Esteira {
     /**
      * Tempo que a esteira permanece ligada
      */
-    private double contadorTempo = 0;
+    private double tempoExecucao = 0;
     /**
-     * Atributo do tipo Pedido, com informações da classe, como nome do cliente, quantidade de produtos e prazo
+     * Lista sincronizada de pedidos
      */
-    private Pedido pedido;
+    private SyncList listaPedidos;
     /**
      * Quantidade de pacotes do pedido
      */
@@ -23,41 +26,104 @@ public class Esteira {
     /**
      * Tempo em segundos para o pedido
      */
-    private double tempoSeg;
+    private double tempoProdPacote;
+
     /**
-     * Empacota o pedido, ou seja, os produtos contidos no pacote, atualizando os tempos de retorno e tempo que a esteira fica ligada
-     * @param pedido Pedido que virá a ser empacotado
+     * Número de pedidos empacotados pela esteira
      */
-    public void Empacotar(Pedido pedido){
-        this.pedido = pedido;
-        double totalPacote = (double) this.pedido.getCliente().getQtdeProduto()/20;
-        this.qtdePacote = (int) Math.ceil(totalPacote);
-        int tempoPacote = 5 * this.qtdePacote;
-        double tempoTransicao = this.qtdePacote * 0.5;
-        this.tempoSeg = tempoPacote + tempoTransicao;
-        this.contadorTempo += this.tempoSeg; // soma o tempo transcorrido com o tempo do pacote atual e atribui ao contador
-        pedido.setTempoRetorno(this.contadorTempo);// seta no pedido o tempo de retorno
-        contadorPctAntesVan();
+    private int numOp;
+
+    /**
+     * Tempo total de retorno de pedidos da esteira
+     */
+    private double tempoTotalRetorno = 0;
+
+    /**
+     * Quantidade de pedidos empacotados
+     */
+    private int quantPedidosEmpacotados = 0;
+
+    /**
+     * Quantidade de pedidos que perderam o prazo
+     */
+    private int qtdePedidosQuePerderamPrazo = 0;
+    /**
+     * Id da Esteira
+     */
+    public int id = 0;
+    
+    /**
+     * Construtor
+     * @param pedidos - Lista sincronizada de pedidos
+     * @param qtdPedidos - Número de pedidos que será empacotados pela esteira
+     * @param id - Número identificador da esteira
+     */
+    public Esteira(SyncList pedidos, int qtdPedidos, int id){
+        this.listaPedidos = pedidos;
+        this.numOp = qtdPedidos;
+        this.id = id;
     }
+
+    /**
+     * Método sobrescrito da classe Thread que inicia uma thread, realiza o empacotamento dos produtos dos pedidos
+     */
+    @Override
+    public void run(){
+        int count = 0;
+        int posRemocao = 0;
+
+        while(count < this.numOp){
+            if((this.listaPedidos.sizeList() > 0) && (posRemocao < this.listaPedidos.sizeList())){
+                if(this.tempoExecucao /60 >= this.listaPedidos.getPedido(posRemocao).getCliente().horaChegada){
+                    Pedido pedido = this.listaPedidos.removePedido(posRemocao);
+                    double pacote = (double) pedido.getCliente().getQtdeProduto()/20;
+                    this.qtdePacote = (int) Math.ceil(pacote);
+                    this.tempoProdPacote = (5 * this.qtdePacote) + (this.qtdePacote * 0.5);
+                    this.tempoExecucao += this.tempoProdPacote; 
+                    if(pedido.getCliente().getHoraChegada() != 0){
+                        pedido.setTempoRetorno(this.tempoExecucao - (pedido.getCliente().getHoraChegada() * 60));
+                        this.tempoTotalRetorno += pedido.getTempoRetorno();
+                    } else {
+                        this.tempoTotalRetorno += this.tempoExecucao;
+                    }
+                    if(pedido.getCliente().getPrazo() != 10000){
+                        if(!(pedido.getTempoRetorno() < pedido.getCliente().getPrazo() * 60)){
+                            this.setQtdePedidosQuePerderamPrazo(this.getQtdePedidosQuePerderamPrazo() + 1);
+                        }
+                    }
+                    contadorPctAntesVan();
+                    this.quantPedidosEmpacotados++;
+                    count++;
+                    posRemocao = 0;
+                }
+                else{
+                    posRemocao++;
+                }
+            }
+        }
+        System.out.println("A quantidade de pedidos empacotados na esteira " + this.id + " foi de: " + count);
+    }
+    
+
     /**
      * Tempo que a esteira ficou ligada
      * @return Contador de tempo que a esteira ficou ligada
      */
-    public double getContadorTempo() {
-        return contadorTempo;
+    public double getTempoExecucao() {
+        return tempoExecucao;
     }
     /**
-     * Atribui a variavel contadorTempo o tempo que a esteira ficou ligada
-     * @param contadorTempo Tempo que a esteira ficou ligada
+     * Atribui a variavel tempoExecucao o tempo que a esteira ficou ligada
+     * @param tempoExecucao Tempo que a esteira ficou ligada
      */
-    public void setContadorTempo(double contadorTempo) {
-        this.contadorTempo = contadorTempo;
+    public void setTempoExecucao(double tempoExecucao) {
+        this.tempoExecucao = tempoExecucao;
     }
     /**
      * Atualiza a quantidade de pacotes embalados antes da saída da van
      */
     private void contadorPctAntesVan () {
-    	if(this.contadorTempo <=tempoSaidaVan) {
+    	if(this.tempoExecucao <=tempoSaidaVan) {
             this.setQtdPacoteEmbaladoAntesVan(this.getQtdPacoteEmbaladoAntesVan() + qtdePacote);
     	}
     }
@@ -75,33 +141,20 @@ public class Esteira {
     public void setQtdePacote(int qtdePacote) {
         this.qtdePacote = qtdePacote;
     }
-    /**
-     * Retorna o pedido
-     * @return Pedido, trás o pedido
-     */
-    public Pedido getPedido() {
-        return this.pedido;
-    }
-    /**
-     * Atribui um pedido a variavel pedido, contendo informações como o cliente e tempo de retorno
-     * @param pedido Pedido que contém os produos a serem empacotados
-     */
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
+
     /**
      * Tempo de embalagem de produtos de um pedido
      * @return Tempo em segundos gastos para embalar os produtos de um pedido
      */
-    public double getTempoSeg() {
-        return tempoSeg;
+    public double getTempoProdPacote() {
+        return tempoProdPacote;
     }
     /**
-     * Atribui a variavel tempoSeg o tempo em segundos gastos para embalar os produtos de um pedido
+     * Atribui a variavel tempoProdPacote o tempo em segundos gastos para embalar os produtos de um pedido
      * @param tempoSeg Tempo em segundos gastos para embalar os produtos de um pedido
      */
     public void setTempoSeg(int tempoSeg) {
-        this.tempoSeg = tempoSeg;
+        this.tempoProdPacote = tempoSeg;
     }
     /**
      * Retorna a quantidade de pacotes embalados antes da saída da van
@@ -117,4 +170,21 @@ public class Esteira {
     public void setQtdPacoteEmbaladoAntesVan(int qtdPacoteEmbaladoAntesVan) {
             this.qtdPacoteEmbaladoAntesVan = qtdPacoteEmbaladoAntesVan;
     }
+
+    /**
+     * Calcula o tempo de retorno médio dos pedidos da esteira
+     * @return tempo de retorno médio dos pedidos da esteira
+     */
+    public double getTempoMedioRetornoEsteira(){
+        double tempoMedio = this.tempoTotalRetorno / this.quantPedidosEmpacotados;
+        return tempoMedio;
+    }
+
+	public int getQtdePedidosQuePerderamPrazo() {
+		return qtdePedidosQuePerderamPrazo;
+	}
+
+	public void setQtdePedidosQuePerderamPrazo(int qtdePedidosQuePerderamPrazo) {
+		this.qtdePedidosQuePerderamPrazo = qtdePedidosQuePerderamPrazo;
+	}
 }

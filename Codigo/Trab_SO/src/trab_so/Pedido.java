@@ -1,18 +1,6 @@
 package trab_so;
 
-public class Pedido {
-    /**
-    * Constante que armazena o volume máximo permitido em um único pacote
-    */
-    private final int MAXVOLUMEPACOTE = 5000;
-    /**
-    * Constante que armazena o tempo de produção de um pacote, em segundos
-    */
-    private final int TEMPOPRODUCAO = 5;
-    /**
-    * Constante que armazena a quantidade máxima de produtos permitidos em um único pacote
-    */
-    private final int MAXQTDEPRODUTO = 20;
+public class Pedido{
     /**
     * Variável do tipo Cliente, que armazena informações relativas a ele, como nome
     */
@@ -21,7 +9,7 @@ public class Pedido {
      * Armazena o tempo de retorno de cada pedido
      */
     private double tempoRetorno;
-    /**
+    /*
      * Construtor da classe Pedido; vincula um cliente ao pedido
      * @param cliente Cliente vinculado ao pedido
      */
@@ -57,4 +45,5 @@ public class Pedido {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
+
 }

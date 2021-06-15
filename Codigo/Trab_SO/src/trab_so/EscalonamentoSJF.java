@@ -6,73 +6,92 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class EscalonamentoSJF {
+public class EscalonamentoSJF extends Thread{
     /**
-     * Quantidade maxima de pacotes embalados
+     * Quantidade maxima de pedidos realizados
      */
-    private int maxQtdePacote = 0;
-    /**
-     * Quantidade de pedidos do arquivo.txt
-     */
-    private final int tam = 168;
+    private int quantPedidos = 319;
+
     /**
      * Tempo total de retorno dos pedidos
      */
     private double tempoTotalRetorno = 0;
+
     /**
-     * Atributo do tipo Esteira com seus atributos e métodos
+     * Lista sincronizada de pedidos
      */
-    private Esteira esteira = new Esteira();
+    private SyncList pedidos;
+
     /**
-     * ArrayList do tipo Pedido com seus atributos e métodos
+     * @param listaPedidos - lista sincronizada
      */
-    private List<Pedido> pedidos = new ArrayList<>();
+    public EscalonamentoSJF(SyncList listaPedidos){
+        this.pedidos = listaPedidos;
+
+    }
+
     /**
-     * Contrutor da classe EscalonamentoSJF
-     * Lê o arquivo.txt e monta 2 ArraysList de pedidos, uma com e outra sem prazo para os pedidos, ordenando pela quantidade de produtos do pedido, em seguida, monta uma lista juntando os 2 ArrayList, primeiramente o com prazo 
-     * @throws FileNotFoundException 
+     * Método sobrescrito da classe Thread que inicia uma thread
      */
-    public EscalonamentoSJF() throws FileNotFoundException {
-        Scanner leitor = new Scanner(new File("SO_20_DadosEmpacotadeira1.txt"));
-        Lista listaPacotes = new Lista();
+    @Override
+    public void run() {
+        try {
+            criaFila();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Cria a 2 vetores de pedidos com prazo e sem prazo, ordena pela menor quantidade de pacotes e adiciona os pedidos
+     * na lista sincronizada
+     * @throws FileNotFoundException - Exceção de arquivo não encontrado
+     */
+    private void criaFila() throws FileNotFoundException {
+        Scanner leitor = new Scanner(new File("SO_20_DadosEmpacotadeira_2.txt"));
         String linha = leitor.nextLine();
-        List<ConteudoItemLista> pedidosComPrazo = new ArrayList<>();
-        List<ConteudoItemLista> pedidosSemPrazo = new ArrayList<>();
+        List<Pedido> pedidosComPrazo = new ArrayList<>();
+        List<Pedido> pedidosSemPrazo = new ArrayList<>();
         while(leitor.hasNextLine()) {
             linha = leitor.nextLine();
             String[] dados = linha.split(";");
             if(dados.length > 1) {
-                if(Integer.parseInt(dados[2]) > 0 && Integer.parseInt(dados[2]) <= 200){
-                    ConteudoItemLista conteudo = new ConteudoItemLista(new Pedido(new Cliente(dados[0], Integer.parseInt(dados[1]), Integer.parseInt(dados[2]))));
-                    pedidosComPrazo.add(conteudo);
+                if(Integer.parseInt(dados[2]) > 0 && Integer.parseInt(dados[2]) <= 250){
+                    Pedido pedido = new Pedido(new Cliente(dados[0], Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3])));
+                    pedidosComPrazo.add(pedido);
+                    this.quantPedidos++;
                 }else{
-                    ConteudoItemLista conteudo = new ConteudoItemLista(new Pedido(new Cliente(dados[0], Integer.parseInt(dados[1]), Integer.parseInt(dados[2]))));
-                    pedidosSemPrazo.add(conteudo);
+                    Pedido pedido = new Pedido(new Cliente(dados[0], Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3])));
+                    pedidosSemPrazo.add(pedido);
+                    this.quantPedidos++;
                 }
             }
         }
-        ConteudoItemLista [] comPrazo = pedidosComPrazo.toArray(new ConteudoItemLista[pedidosComPrazo.size()]);
-        ConteudoItemLista [] semPrazo = pedidosSemPrazo.toArray(new ConteudoItemLista[pedidosSemPrazo.size()]);
+        Pedido[] vetPedidoPrazo = pedidosComPrazo.toArray(new Pedido[pedidosComPrazo.size()]);
+        Pedido[] vetPedidoSemPrazo = pedidosSemPrazo.toArray(new Pedido[pedidosComPrazo.size()]);
+
+        insertionSort(vetPedidoPrazo);
+        insertionSort(vetPedidoSemPrazo);
+
+        for(int i =0; i<vetPedidoPrazo.length; i++){
+            this.pedidos.addPosicao(i, vetPedidoPrazo[i]);
+        }
+        for(int i =0; i<vetPedidoSemPrazo.length; i++){
+            this.pedidos.add(vetPedidoSemPrazo[i]);
+        }
+
         leitor.close();
-        insertionSort(comPrazo);
-        insertionSort(semPrazo);
-        for(int cont = 0; cont < comPrazo.length; cont++) {
-            listaPacotes.inserirFinal(comPrazo[cont]);
-        }
-        for(int cont = 0; cont < semPrazo.length; cont++) {
-            listaPacotes.inserirFinal(semPrazo[cont]);
-        }
-        ligaEsteira(listaPacotes);
     }
+
     /**
-     * Ordena os pedidos pelo prazo
+     * Ordena os pedidos pela quantidade de produtos
      * @param dados 
      */
-    static void insertionSort(ConteudoItemLista [] dados){
+    static void insertionSort(Pedido [] dados){
         for(int posRef = 1; posRef < dados.length; posRef++){  
             int posComp = posRef - 1;                           
-            ConteudoItemLista dadoRef = dados[posRef];                        
-            while (posComp >= 0 && dadoRef.pedido.getCliente().getQtdeProduto() < dados[posComp].pedido.getCliente().getQtdeProduto())
+            Pedido dadoRef = dados[posRef];
+            while (posComp >= 0 && dadoRef.getCliente().getQtdeProduto() < dados[posComp].getCliente().getQtdeProduto())
                 posComp--;
             for (int posCopia = posRef; posCopia > (posComp+1); posCopia--) {
                 dados[posCopia] = dados[posCopia - 1];
@@ -80,54 +99,13 @@ public class EscalonamentoSJF {
             dados[posComp + 1] = dadoRef;
         }
     }
+
     /**
-     * Realiza uma ordenação e inseri no ArrayList de pedidos, além de atualizar a quantidade de pacotes embalados
-     * @param listaPacotes 
+     * Contém a quantidade de Pedidos
+     * @return Quantidade pedidos
      */
-    public void ligaEsteira(Lista listaPacotes){
-        while(listaPacotes.primeiro.proximo != null){
-            this.esteira.Empacotar(listaPacotes.primeiro.proximo.conteudo.pedido);
-            this.tempoTotalRetorno += listaPacotes.primeiro.proximo.conteudo.pedido.getTempoRetorno();
-            if(listaPacotes.primeiro.proximo.conteudo.pedido.getTempoRetorno() > (listaPacotes.primeiro.proximo.conteudo.pedido.getCliente().getPrazo()*60))
-                pedidos.add(listaPacotes.primeiro.proximo.conteudo.pedido);
-            listaPacotes.primeiro = listaPacotes.primeiro.proximo;
-        }
-        this.maxQtdePacote = this.esteira.getQtdPacoteEmbaladoAntesVan();
+    public int getQuantPedidos() {
+        return this.quantPedidos;
     }
-    /**
-     * Retorna mensagens com os pedidos atrasados, contendo nome do cliente, tempo de retorno do pedido, em segundos
-     */
-    public void getAtrasados(){
-        for(Pedido pedido: this.pedidos){
-            System.out.println("Pedido atrasado do cliente "+ pedido.getCliente().getNome()+" Tempo retorno: "+pedido.getTempoRetorno()+" Prazo: "+pedido.getCliente().getPrazo()*60);
-        }
-    }
-    /**
-     * Tempo que a esteira permanece ligada
-     * @return Tempo de atividade da esteira
-     */
-    public double getTempoDeAtividadeEsteira(){
-        return this.esteira.getContadorTempo();
-    }
-    /**
-     * Tempo médio de retorno dos pedidos da esteira
-     * @return Tempo médio de retorno dos pedidos, dividindo o tempo total de retorno pelo numero de pedidos
-     */
-    public double getTempoMedioRetorno(){
-        return (this.tempoTotalRetorno / this.tam);
-    }
-    /**
-     * Contém a quantidade de pacotes embalados
-     * @return Quantidade máxima de pacotes embalados
-     */
-    public int getMaxQtdePacote() {
-            return maxQtdePacote;
-    }
-    /**
-     * Atribui a variavel maxQtdePacote o numero de pacotes embalados
-     * @param maxQtdePacote de pacotes embalados 
-     */
-    public void setMaxQtdePacote(int maxQtdePacote) {
-            this.maxQtdePacote = maxQtdePacote;
-    }
+
 }

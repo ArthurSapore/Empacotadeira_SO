@@ -13,19 +13,39 @@ public class Cliente {
      */
     public int prazo;
     /**
+     * Hora de chegada (em minutos) do pedido
+     */
+    public int horaChegada = 0;
+    /**
      * Construtor da classe Cliente
      * @param nome Nome do cliente
      * @param qtdeProduto Quantidade de produtos do pedido
      * @param prazoMin Prazo em minutos para o pedido (0 se não houver prazo)
+     * @param chegada Tempo de chegada para o pedido (em minutos)
      */
-    public Cliente(String nome, int qtdeProduto, int prazoMin){
+    public Cliente(String nome, int qtdeProduto, int prazoMin, int chegada){
         this.nome = nome;
         this.qtdeProduto = qtdeProduto;
+        this.horaChegada = chegada;
         if(prazoMin == 0){
-            this.prazo = 1000;
+            this.prazo = 10000;
         }else{
             this.prazo = prazoMin;
         }
+    }
+    /**
+     * Retorna hora de chegada do pedido
+     * @return hora de chegada
+     */
+    public int getHoraChegada() {
+        return horaChegada;
+    }
+    /**
+     * Atribui a variavel horaChegada ao atributo hora de chegada
+     * @param horaChegada hora de chegada (em minutos)
+     */
+    public void setHoraChegada(int horaChegada) {
+        this.horaChegada = horaChegada;
     }
     /**
      * Retorna o nome do cliente
@@ -59,8 +79,8 @@ public class Cliente {
     public void setPrazo(int prazo) { this.prazo = prazo; }
     /**
      * Retorna informações do Cliente
-     * @return Texto contendo o nome, quantide de produtos e prazo do pedido
+     * @return Texto contendo o nome, quantide de produtos, prazo do pedido e a hora de chegada do pedido
      */
     @Override
-    public String toString(){ return "Cliente: " + this.nome + " quantide de produtos do pedido: " + this.qtdeProduto + " prazo do pedido: " + this.prazo; }
+    public String toString(){ return "Cliente: " + this.nome + " quantide de produtos do pedido: " + this.qtdeProduto + " prazo do pedido: " + this.prazo + " hora de chegada do pedido: " + this.horaChegada; }
 }
