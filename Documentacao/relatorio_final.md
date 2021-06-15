@@ -23,13 +23,8 @@ mostrar algum resultado relevante do trabalho (até 10 linhas)._
 
 
 ## 1. Introdução
-	Uma empresa tem seu negócio baseado em empacotar produtos que serão enviados a lojas, 
-supermercados e distribuidoras para venda fracionada ao consumidor final. Este processo está prestes 
-a ser automatizado utilizando uma esteira e braços mecânicos, mas os gerentes estão na dúvida sobre
-como obter o melhor rendimento do equipamento.
-	O funcionamento básico do equipamento é receber um lote de produtos, empacotá-lo e colocá-lo em 
-seguida em uma caixa que será depois levada para transporte. De maneira geral, os produtos são 
-colocados em uma esteira e, ao passar por um braço mecânico, este fará a embalagem dos produtos e a remoção desta embalagem para a caixa de transporte.
+ Uma empresa tem seu negócio baseado em empacotar produtos que serão enviados a lojas, supermercados e distribuidoras para venda fracionada ao consumidor final. Este processo está prestes a ser automatizado utilizando uma esteira e braços mecânicos, mas os gerentes estão na dúvida sobre como obter o melhor rendimento do equipamento.
+ O funcionamento básico do equipamento é receber um lote de produtos, empacotá-lo e colocá-lo em  seguida em uma caixa que será depois levada para transporte. De maneira geral, os produtos são colocados em uma esteira e, ao passar por um braço mecânico, este fará a embalagem dos produtos e a remoção desta embalagem para a caixa de transporte.
 
 
 
@@ -38,25 +33,18 @@ colocados em uma esteira e, ao passar por um braço mecânico, este fará a emba
 
 
 ### 1.2 Problema
-	O processo de empacotamento está prestes 
-a ser automatizado utilizando uma esteira e braços mecânicos, mas os gerentes estão na dúvida sobre
-como obter o melhor rendimento do equipamento.
+ O processo de empacotamento está prestes a ser automatizado utilizando uma esteira e braços mecânicos, mas os gerentes estão na dúvida sobre como obter o melhor rendimento do equipamento.
  
-	Esta mudança visa aumentar a capacidade de produção da empresa para atender a mais pedidos diários e garantir o prazo de todos 
-que optaram a pagar um adicional por isso. Além disso, a empresa vai passar a aceitar pedidos ao longo do dia (anteriormente, as listas de pedidos 
-eram montadas com um dia de antecedência).
+ Esta mudança visa aumentar a capacidade de produção da empresa para atender a mais pedidos diários e garantir o prazo de todos que optaram a pagar um adicional por isso. Além disso, a empresa vai passar a aceitar pedidos ao longo do dia (anteriormente, as listas de pedidos eram montadas com um dia de antecedência).
 
 
 ### 1.3 Objetivo Geral
-	O objetivo deste trabalho é realizar simulações computacionais de como se daria o empacotamento
-de uma quantidade de pedidos pré-determinados, criados a partir da demanda esperada da empresa 
-para um dia típico de trabalho. 
+ O objetivo deste trabalho é realizar simulações computacionais de como se daria o empacotamento de uma quantidade de pedidos pré-determinados, criados a partir da demanda esperada da empresa para um dia típico de trabalho. 
 
 ### 1.3.1 Objetivos Especificos
-	• Minimizar o tempo médio gasto para terminar todos os pacotes;
-	• Maximizar a quantidade de pacotes produzidos antes de meio dia, quando sai a primeira van 
-para entrega;
-	• Atender a prazos estritos de clientes prioritários, que pagam a mais por isso.
+ • Minimizar o tempo médio gasto para terminar todos os pacotes;
+ • Maximizar a quantidade de pacotes produzidos antes de meio dia, quando sai a primeira van para entrega;
+ • Atender a prazos estritos de clientes prioritários, que pagam a mais por isso.
 
 ### 1.4 Justificativa
 
@@ -65,9 +53,7 @@ para entrega;
 ## 2. Modelagem do processo de negócio
 ### 2.1. Análise da situação atual
 
-	Atualmente, todo processo de empacotamento da empresa é realizado manualmente por diversos funcionários, 
-o que acaba prejudicando significativamente a eficiência do empacotamento. Além disso, a empresa gera a lista de pedidos antecipadamente, 
-ou seja, os pedidos que serão empacotados no dia são ordenados no dia anterior. 
+Atualmente, todo processo de empacotamento da empresa é realizado manualmente por diversos funcionários, o que acaba prejudicando significativamente a eficiência do empacotamento. Além disso, a empresa gera a lista de pedidos antecipadamente, ou seja, os pedidos que serão empacotados no dia são ordenados no dia anterior. 
 Desta maneira, todos os pedidos esperam no mínimo 1 dia útil para serem empacotados. Impossibilitando assim, que a empresa receba e empacote os produtos no mesmo dia.
 
 
@@ -80,9 +66,9 @@ Desta maneira, todos os pedidos esperam no mínimo 1 dia útil para serem empaco
 
 Tecnologia utilizada: JAVA.
 
-
 Ferramentas: Eclipse IDE;
 
+![Exemplo de um Modelo BPMN](imagens/arthurvitorsapore_81994_3197335_Tecnologias.jpg "Tecnologias utilizada").
 
 
 ## 4. Modelagem de dados
